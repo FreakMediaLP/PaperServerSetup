@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Function to get the server name
+# get the server name
 function get_server_name {
     while true; do
         read -p "Server name: " SERVER_NAME
@@ -12,7 +12,7 @@ function get_server_name {
     done
 }
 
-# Function to get the Minecraft version
+# get the Minecraft version
 function get_minecraft_version {
     while true; do
         read -p "Minecraft version: " MINECRAFT_VERSION
@@ -24,18 +24,17 @@ function get_minecraft_version {
     done
 }
 
-# Function to query and download the build
+# query and download the build
 function download_paper_jar {
     local builds_url="https://api.papermc.io/v2/projects/paper/versions/$MINECRAFT_VERSION/builds"
     local builds_response=$(curl -s "$builds_url")
 
-    # Search for stable builds
+    # search for stable builds
     if ! echo "$builds_response" | jq -e 'type == "object" and has("builds")' > /dev/null; then
         echo "No builds for provided Version \"$MINECRAFT_VERSION\" found"
         exit 1
     fi
 
-    # Suche nach stabilen Builds
     local stable_builds=$(echo "$builds_response" | jq -r '.builds[] | select(.channel == "default") | .build')
     local latest_stable_build=$(echo "$stable_builds" | sort -n | tail -n 1)
 
@@ -43,7 +42,7 @@ function download_paper_jar {
         echo "No stable build for Minecraft version \"$MINECRAFT_VERSION\" found."
         read -p "Do you want to look for experimental builds? [Y/n] " response
         if [[ ! "$response" =~ ^[nN]$ ]]; then
-            # Suche nach experimentellen Builds
+            # search for unstabile builds
             local experimental_builds=$(echo "$builds_response" | jq -r '.builds[] | select(.channel == "experimental") | .build')
             local latest_experimental_build=$(echo "$experimental_builds" | sort -n | tail -n 1)
             if [ -z "$latest_experimental_build" ]; then
@@ -80,7 +79,7 @@ function download_paper_jar {
     fi
 }
 
-# Function to accept EULA
+# accept EULA
 function accept_eula {
     EULA_URL="https://raw.githubusercontent.com/FreakMediaLP/PaperServerSetup/main/eula.txt"
     echo
@@ -95,7 +94,7 @@ function accept_eula {
     fi
 }
 
-# Function to create aliases
+# create aliases
 function create_aliases {
     echo
     read -p "Create Tmux-Aliases for easier Server-Operation? [Y/n]: " create_aliases_response
@@ -115,7 +114,7 @@ function create_aliases {
         cat ~/.bashrc >> ~/.bashrc.tmp
         mv ~/.bashrc.tmp ~/.bashrc
 
-        source ~/.bashrc  # Apply aliases
+        source ~/.bashrc  # apply aliases
 
         echo "Added following Aliases (make sure to install tmux)"
         echo
@@ -129,7 +128,7 @@ function create_aliases {
     fi
 }
 
-# Initial setup logic
+# initial setup logic
 initial_setup=false
 get_server_name
 get_minecraft_version
