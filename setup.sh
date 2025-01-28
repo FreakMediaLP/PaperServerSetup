@@ -7,14 +7,15 @@ function ask_confirm {
     [[ "${response,,}" =~ ^(y|)$ ]]
 }
 
-# check for & install jq
-function install_jq {
-    if ! command -v jq &> /dev/null; then
-        if ask_confirm "jq is not installed, install jq?"; then
-            echo "installing jq..."
+# check for & install packages
+function install_package {
+    local package_name="$1"
+    if ! command -v "$package_name" &> /dev/null; then
+        if ask_confirm "$package_name is not installed, install $package_name?"; then
+            echo "installing $package_name..."
             sudo apt update > /dev/null 2>&1
-            sudo apt install -y jq > /dev/null 2>&1 || {
-                echo "Error while installing jq. Please install jq manually."
+            sudo apt install -y $package_name > /dev/null 2>&1 || {
+                echo "Error while installing $package_name. Please install it manually."
                 exit 1
             }
         else
