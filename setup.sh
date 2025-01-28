@@ -130,8 +130,6 @@ function create_aliases {
         cat ~/.bashrc >> ~/.bashrc.tmp
         mv ~/.bashrc.tmp ~/.bashrc
 
-        #source ~/.bashrc  # apply aliases
-
         echo "Added following Aliases:"
         echo
         echo "${SERVER_NAME}_console:   opens server console (tmux session)"
