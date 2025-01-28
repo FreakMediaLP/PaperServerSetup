@@ -44,8 +44,6 @@ function get_minecraft_version {
 
 # query and download the build
 function download_paper_jar {
-    install_package "jq"
-
     local builds_url="https://api.papermc.io/v2/projects/paper/versions/$MINECRAFT_VERSION/builds"
     local builds_response=$(curl -s "$builds_url")
 
@@ -84,6 +82,7 @@ function download_paper_jar {
     local download_url="https://api.papermc.io/v2/projects/paper/versions/$MINECRAFT_VERSION/builds/$latest_build/downloads/$jar_name"
 
     # download the build
+    install_package "jq"
     local relative_path=${PWD/#$HOME/}
     mkdir -p "$SERVER_NAME"
     echo "Created directory \"~$relative_path/$SERVER_NAME\""
