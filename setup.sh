@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Oben"
 
 function ask_confirm {
     local prompt="$1"
