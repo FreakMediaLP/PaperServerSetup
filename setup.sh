@@ -143,7 +143,7 @@ function create_aliases {
 
 # initial setup logic
 server_created=false
-install_jq
+install_package "jq"
 get_server_name
 get_minecraft_version
 download_paper_jar
