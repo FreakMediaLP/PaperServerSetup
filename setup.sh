@@ -11,7 +11,9 @@ function ask_confirm {
 function install_jq {
     if ! command -v jq &> /dev/null; then
         if ask_confirm "jq is not installed, install jq?"; then
-            sudo apt update && sudo apt install -y jq || {
+            echo "installing jq..."
+            sudo apt update > /dev/null 2>&1
+            sudo apt install -y jq > /dev/null 2>&1 || {
                 echo "Error while installing jq. Please install jq manually."
                 exit 1
             }
