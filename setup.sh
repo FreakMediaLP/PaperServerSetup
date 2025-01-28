@@ -13,7 +13,7 @@ function ask_confirm {
 function install_package {
     local package_name="$1"
 
-    if ! command -v $package_name &> /dev/null; then
+    if ! command -v "$package_name" &> /dev/null; then
         if ask_confirm "$package_name is not installed, install $package_name?"; then
             echo "installing $package_name..."
             sudo apt update > /dev/null 2>&1
@@ -87,8 +87,6 @@ function download_paper_jar {
     local download_url="https://api.papermc.io/v2/projects/paper/versions/$MINECRAFT_VERSION/builds/$latest_build/downloads/$jar_name"
 
     # download the build
-    install_package "jq"
-
     local relative_path=${PWD/#$HOME/}
     mkdir -p "$SERVER_NAME"
     echo "Created directory \"~$relative_path/$SERVER_NAME\""
@@ -152,6 +150,7 @@ function create_aliases {
 
 # initial setup logic
 server_created=false
+install_package "jq"
 get_server_name
 get_minecraft_version
 download_paper_jar
