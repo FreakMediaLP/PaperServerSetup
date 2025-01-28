@@ -13,11 +13,11 @@ function ask_confirm {
 function install_package {
     local package_name="$1"
 
-    if ! command -v "$package_name" &> /dev/null; then
+    if ! command -v $package_name &> /dev/null; then
         if ask_confirm "$package_name is not installed, install $package_name?"; then
             echo "installing $package_name..."
             sudo apt update > /dev/null 2>&1
-            sudo apt install -y "$package_name" > /dev/null 2>&1 || {
+            sudo apt install -y $package_name > /dev/null 2>&1 || {
                 echo "Error while installing $package_name. Please install it manually."
                 exit 1
             }
