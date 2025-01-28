@@ -44,6 +44,8 @@ function get_minecraft_version {
 
 # query and download the build
 function download_paper_jar {
+    install_package "jq"
+
     local builds_url="https://api.papermc.io/v2/projects/paper/versions/$MINECRAFT_VERSION/builds"
     local builds_response=$(curl -s "$builds_url")
 
@@ -143,7 +145,6 @@ function create_aliases {
 
 # initial setup logic
 server_created=false
-install_package "jq"
 get_server_name
 get_minecraft_version
 download_paper_jar
