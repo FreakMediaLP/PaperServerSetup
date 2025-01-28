@@ -130,13 +130,13 @@ function create_aliases {
         cat ~/.bashrc >> ~/.bashrc.tmp
         mv ~/.bashrc.tmp ~/.bashrc
 
-        source ~/.bashrc  # apply aliases
+        #source ~/.bashrc  # apply aliases
 
-        echo "Added following Aliases (make sure to install tmux)"
+        echo "Added following Aliases:"
         echo
         echo "${SERVER_NAME}_console:   opens server console (tmux session)"
         echo "${SERVER_NAME}_start:     starts server (with provided RAM limits)"
-        echo "${SERVER_NAME}_kill:      stops server (kill only used for easier naming)"
+        echo "${SERVER_NAME}_kill:      stops server (kill only used for easier tab-completion)"
         echo "${SERVER_NAME}_restart:   stops & starts server"
         echo
     else
