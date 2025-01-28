@@ -1,14 +1,32 @@
 #!/bin/bash
 
+function ask_confirm {
+    local prompt="$1"
+    read -p "$prompt [Y/n]: " response
+    response=${response:-Y}
+    [[ "${response,,}" =~ ^(y|)$ ]]
+}
+
+# check for & install jq
+function install_jq {
+    if ! command -v jq &> /dev/null; then
+        if ask_confirm "jq is not installed, install jq?"; then
+            sudo apt update && sudo apt install -y jq || {
+                echo "Error while installing jq. Please install jq manually."
+                exit 1
+            }
+        else
+            exit 1
+        fi
+    fi
+}
+
 # get the server name
 function get_server_name {
     while true; do
         read -p "Server name: " SERVER_NAME
-        if [ ! -d "$SERVER_NAME" ]; then
-            break
-        else
-            echo "Server \"$SERVER_NAME\" already exists, choose a different name"
-        fi
+        [[ ! -d "$SERVER_NAME" ]] && break
+        echo "Server \"$SERVER_NAME\" already exists, choose a different name"
     done
 }
 
@@ -16,11 +34,8 @@ function get_server_name {
 function get_minecraft_version {
     while true; do
         read -p "Minecraft version: " MINECRAFT_VERSION
-        if [[ $MINECRAFT_VERSION =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
-            break
-        else
-            echo "Invalid Minecraft version, enter a valid version (e.g. 1.16, 1.17.1)"
-        fi
+        [[ $MINECRAFT_VERSION =~ ^[0-9]+(\.[0-9]+)*$ ]] && break
+        echo "Invalid Minecraft version, enter a valid version (e.g. 1.16, 1.17.1)"
     done
 }
 
@@ -40,9 +55,8 @@ function download_paper_jar {
 
     if [ -z "$latest_stable_build" ]; then
         echo "No stable build for Minecraft version \"$MINECRAFT_VERSION\" found."
-        read -p "Do you want to look for experimental builds? [Y/n] " response
-        if [[ ! "$response" =~ ^[nN]$ ]]; then
-            # search for unstabile builds
+        if ask_confirm "Do you want to look for experimental builds?"; then
+            # search for unstable builds
             local experimental_builds=$(echo "$builds_response" | jq -r '.builds[] | select(.channel == "experimental") | .build')
             local latest_experimental_build=$(echo "$experimental_builds" | sort -n | tail -n 1)
             if [ -z "$latest_experimental_build" ]; then
@@ -60,12 +74,13 @@ function download_paper_jar {
         echo "Build for Minecraft version \"$MINECRAFT_VERSION\" found."
     fi
 
+    # set download link
     local jar_name="paper-$MINECRAFT_VERSION-$latest_build.jar"
     local download_url="https://api.papermc.io/v2/projects/paper/versions/$MINECRAFT_VERSION/builds/$latest_build/downloads/$jar_name"
 
+    # download the build
     local relative_path=${PWD/#$HOME/}
     mkdir -p "$SERVER_NAME"
-
     echo "Created directory \"~$relative_path/$SERVER_NAME\""
     echo
     echo "Downloading latest $build_type build for Minecraft version \"$MINECRAFT_VERSION\"..."
@@ -75,7 +90,7 @@ function download_paper_jar {
         exit 1
     else
         echo "Successfully downloaded paper.jar into server directory"
-        initial_setup=true
+        server_created=true
     fi
 }
 
@@ -83,9 +98,7 @@ function download_paper_jar {
 function accept_eula {
     EULA_URL="https://raw.githubusercontent.com/FreakMediaLP/PaperServerSetup/main/eula.txt"
     echo
-    read -p "Accept the EULA (https://aka.ms/MinecraftEULA)? [Y/n]: " accept
-    accept=${accept:-Y}
-    if [[ "$accept" =~ ^[Yy]$ ]]; then
+    if ask_confirm "Accept the EULA (https://aka.ms/MinecraftEULA)?"; then
         curl -fsSL "$EULA_URL" -o "$SERVER_NAME/eula.txt"
         echo "EULA accepted, downloaded eula.txt"
     else
@@ -97,12 +110,8 @@ function accept_eula {
 # create aliases
 function create_aliases {
     echo
-    read -p "Create Tmux-Aliases for easier Server-Operation? [Y/n]: " create_aliases_response
-    create_aliases_response=${create_aliases_response:-Y}
-
-    if [[ "$create_aliases_response" =~ ^[Yy]$ ]]; then
+    if ask_confirm "Create Tmux-Aliases for easier Server-Operation?"; then
         local relative_path=${PWD/#$HOME/}
-
         {
             echo "# $SERVER_NAME"
             echo "alias ${SERVER_NAME}_console='tmux attach -t $SERVER_NAME'"
@@ -129,13 +138,13 @@ function create_aliases {
 }
 
 # initial setup logic
-initial_setup=false
+server_created=false
+install_jq
 get_server_name
 get_minecraft_version
 download_paper_jar
 
-
-if [ "$initial_setup" = true ]; then
+if [ "$server_created" = true ]; then
     accept_eula
     create_aliases
 fi
