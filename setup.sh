@@ -14,23 +14,7 @@ function install_jq {
             echo "installing jq..."
             sudo apt update > /dev/null 2>&1
             sudo apt install -y jq > /dev/null 2>&1 || {
-                echo "Error while installing jq. Please install it manually."
-                exit 1
-            }
-        else
-            exit 1
-        fi
-    fi
-}
-
-# check for & install tmux
-function install_tmux {
-    if ! command -v tmux &> /dev/null; then
-        if ask_confirm "tmux is not installed, install tmux?"; then
-            echo "installing tmux..."
-            sudo apt update > /dev/null 2>&1
-            sudo apt install -y tmux > /dev/null 2>&1 || {
-                echo "Error while installing tmux. Please install it manually."
+                echo "Error while installing jq. Please install jq manually."
                 exit 1
             }
         else
