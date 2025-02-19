@@ -37,8 +37,8 @@ function get_server_name {
 function get_minecraft_version {
     while true; do
         read -p "Minecraft version: " MINECRAFT_VERSION
-        [[ $MINECRAFT_VERSION =~ ^[0-9]+(\.[0-9]+)*$ ]] && break
-        echo "Invalid Minecraft version, enter a valid version (e.g. 1.16, 1.17.1)"
+        [[ $MINECRAFT_VERSION =~ ^[0-9]\.[0-9]{1,2}(\.[0-9]{1,2})?$ ]] && break
+        echo "Invalid Minecraft version, enter a valid version (e.g. 1.21, 1.21.1)"
     done
 }
 
